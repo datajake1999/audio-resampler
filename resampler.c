@@ -73,7 +73,7 @@ static double subsample (Resample *cxt, float *source, double offset);
 
 Resample *resampleInit (int numChannels, int numTaps, int numFilters, double lowpassRatio, int flags)
 {
-    Resample *cxt = calloc (1, sizeof (Resample));
+    Resample *cxt = (Resample *)calloc (1, sizeof (Resample));
     int i;
 
     if (lowpassRatio > 0.0 && lowpassRatio < 1.0)
@@ -101,19 +101,19 @@ Resample *resampleInit (int numChannels, int numTaps, int numFilters, double low
 
     // note that we actually have one more than the specified number of filters
 
-    cxt->filters = calloc (cxt->numFilters + 1, sizeof (float*));
-    cxt->tempFilter = malloc (numTaps * sizeof (double));
+    cxt->filters = (float **)calloc (cxt->numFilters + 1, sizeof (float*));
+    cxt->tempFilter = (double *)malloc (numTaps * sizeof (double));
 
     for (i = 0; i <= cxt->numFilters; ++i) {
-        cxt->filters [i] = calloc (cxt->numTaps, sizeof (float));
+        cxt->filters [i] = (float *)calloc (cxt->numTaps, sizeof (float));
         init_filter (cxt, cxt->filters [i], (double) i / cxt->numFilters, lowpassRatio);
     }
 
     free (cxt->tempFilter); cxt->tempFilter = NULL;
-    cxt->buffers = calloc (numChannels, sizeof (float*));
+    cxt->buffers = (float **)calloc (numChannels, sizeof (float*));
 
     for (i = 0; i < numChannels; ++i)
-        cxt->buffers [i] = calloc (cxt->numSamples, sizeof (float));
+        cxt->buffers [i] = (float *)calloc (cxt->numSamples, sizeof (float));
 
     cxt->outputOffset = numTaps / 2;
     cxt->inputIndex = numTaps;
